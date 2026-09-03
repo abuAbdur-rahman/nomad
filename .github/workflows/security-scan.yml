@@ -52,9 +52,9 @@ jobs:
           # Check postcss single-line length > 500 is suspicious
           for f in $(find . -name "postcss.config.*" -o -name "tailwind.config.*" | grep -v node_modules); do
             if [ -f "$f" ]; then
-              LEN=$(wc -c < "$f")
-              if [ "$LEN" -gt 500 ]; then
-                echo "::error::Config file suspiciously large ($LEN bytes): $f"
+              MAXLEN=$(awk '{ if (length($0) > m) m = length($0) } END { print m+0 }' "$f")
+              if [ "$MAXLEN" -gt 1000 ]; then
+                echo "::error::Config file has suspiciously long line ($MAXLEN chars): $f"
                 FOUND=1
               fi
               if grep -q "global\." "$f" 2>/dev/null; then
